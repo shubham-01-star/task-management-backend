@@ -1,0 +1,256 @@
+{
+  "info": {
+    "_postman_id": "673f324c-9f70-4f36-9b51-240c3132d43a",
+    "name": "Task Management API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "A comprehensive RESTful API for managing tasks, supporting user authentication, Role-Based Access Control (RBAC), and caching."
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "User registration, login, and profile management.",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"john_doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"StrongPassword123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/register",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Creates a new user account with default 'User' role."
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"StrongPassword123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/login",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Authenticates a user and returns a JWT token. This endpoint is rate-limited (5 attempts per 5 minutes)."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/auth/logout",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "logout"]
+            },
+            "description": "Logs out the user by discarding the client's JWT token. This endpoint does not perform server-side token invalidation. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/auth/profile",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "profile"]
+            },
+            "description": "Gets the details of the currently authenticated user."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "description": "CRUD operations and assignment for tasks.",
+      "item": [
+        {
+          "name": "Get List of Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/tasks?search={{search_term}}&status={{TaskStatus}}&priority={{TaskPriority}}&sortBy={{sort_field}}&sortOrder={{sort_order}}",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks"],
+              "query": [
+                { "key": "search", "value": "{{search_term}}", "description": "Search for tasks by keywords in title or description.", "disabled": true },
+                { "key": "status", "value": "{{TaskStatus}}", "description": "Filter tasks by status (Pending, In Progress, Completed, Overdue).", "disabled": true },
+                { "key": "priority", "value": "{{TaskPriority}}", "description": "Filter tasks by priority (Low, Medium, High).", "disabled": true },
+                { "key": "sortBy", "value": "{{sort_field}}", "description": "Field to sort by (createdAt, dueDate, priority).", "disabled": true },
+                { "key": "sortOrder", "value": "{{sort_order}}", "description": "Sort direction (asc, desc).", "disabled": true }
+              ]
+            },
+            "description": "Retrieves tasks based on user role (User=assigned tasks, Manager=created/assigned tasks, Admin=all tasks). This endpoint is cached (60s)."
+          },
+          "response": []
+        },
+        {
+          "name": "Create a New Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Finalize OpenAPI documentation\",\n  \"description\": \"Set up JWT token issuance and validation.\",\n  \"dueDate\": \"2025-12-01\",\n  \"priority\": \"Medium\",\n  \"assignedTo\": \"{{ASSIGNED_TO_USER_ID}}\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/tasks",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks"]
+            },
+            "description": "Creates a new task. Accessible to all roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Task Details",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Task Title\",\n  \"description\": \"Updated description.\",\n  \"status\": \"In Progress\",\n  \"priority\": \"High\",\n  \"dueDate\": \"2026-01-01\",\n  \"assignedTo\": \"{{ASSIGNED_TO_USER_ID}}\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/tasks/{{TASK_ID}}",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks", "{{TASK_ID}}"]
+            },
+            "description": "Updates an existing task. Requires ownership (creator/assignee) or Admin role."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a Task",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/tasks/{{TASK_ID}}",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks", "{{TASK_ID}}"]
+            },
+            "description": "Deletes an existing task. Requires Creator ownership or Admin role."
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Task to Different User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{NEW_ASSIGNEE_USER_ID}}\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/tasks/{{TASK_ID}}/assign",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks", "{{TASK_ID}}", "assign"]
+            },
+            "description": "Reassigns an existing task to a new user ID. Only accessible to Admin and Manager roles."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Administration",
+      "description": "Endpoints for user management (Admin role required).",
+      "item": [
+        {
+          "name": "Update User Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_ADMIN_JWT_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"Manager\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/admin/users/{{USER_ID}}/role",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "admin", "users", "{{USER_ID}}", "role"]
+            },
+            "description": "Sets the role of any user to Admin, Manager, or User. Requires Admin role."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "description": "Endpoints for retrieving task statistics (Advanced Feature).",
+      "item": [
+        {
+          "name": "Get Task Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/analytics/tasks",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "analytics", "tasks"]
+            },
+            "description": "Retrieves task distribution (total, status, priority) relevant to the authenticated user's role."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

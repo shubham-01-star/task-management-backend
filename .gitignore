@@ -1,0 +1,35 @@
+Dependencies
+
+/node_modules
+/package-lock.json
+/npm-debug.log*
+
+Compiled TypeScript output
+
+/dist
+/build
+
+Environment files
+
+Store sensitive information like database credentials and JWT secret here.
+
+MUST NOT be committed to Git.
+
+.env
+.env.*
+.DS_Store
+
+Logs
+
+log/
+*.log
+
+Editor/OS temporary files
+
+.vscode
+.idea
+*.suo
+.ntvs
+*.njsproj
+*.sln
+.history

@@ -1,0 +1,689 @@
+{
+  "info": {
+    "_postman_id": "673f324c-9f70-4f36-9b51-240c3132d43a",
+    "name": "Task Management API - Expanded Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "A comprehensive RESTful API for managing tasks, supporting user authentication, Role-Based Access Control (RBAC), and caching. This collection includes expanded test cases for various scenarios (valid, invalid, missing fields, etc.)."
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "User registration, login, and profile management.",
+      "item": [
+        {
+          "name": "Register User - Valid",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/register",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Creates a new user account with default 'User' role (valid credentials)."
+          },
+          "response": []
+        },
+        {
+          "name": "Register User - Missing Username",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"missingusername@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/register",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Attempts to register a user with a missing username (expected to fail with 400)."
+          },
+          "response": []
+        },
+        {
+          "name": "Register User - Invalid Email Format",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"invalidemailuser\",\n  \"email\": \"invalid-email\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/register",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Attempts to register a user with an invalid email format (expected to fail with 400)."
+          },
+          "response": []
+        },
+        {
+          "name": "Register User - Short Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"shortpassuser\",\n  \"email\": \"shortpass@example.com\",\n  \"password\": \"123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/register",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Attempts to register a user with a password shorter than 6 characters (expected to fail with 400)."
+          },
+          "response": []
+        },
+        {
+          "name": "Register User - Existing Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"existinguser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/register",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Attempts to register a user with an email that already exists (expected to fail with 400 after 'Register User - Valid' is run)."
+          },
+          "response": []
+        },
+        {
+          "name": "Login User - Valid",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/login",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Authenticates a valid user and returns a JWT token. This endpoint is rate-limited (5 attempts per 5 minutes)."
+          },
+          "response": []
+        },
+        {
+          "name": "Login User - Invalid Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nonexistent@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/login",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Attempts to log in with a non-existent email (expected to fail with 400)."
+          },
+          "response": []
+        },
+        {
+          "name": "Login User - Incorrect Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/login",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Attempts to log in with correct email but incorrect password (expected to fail with 400)."
+          },
+          "response": []
+        },
+        {
+          "name": "Login User - Missing Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/login",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Attempts to log in with a missing password (expected to fail with 400)."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/auth/logout",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "logout"]
+            },
+            "description": "Logs out the user by discarding the client's JWT token. This endpoint does not perform server-side token invalidation. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Profile - Valid Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/auth/profile",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "profile"]
+            },
+            "description": "Gets the details of the currently authenticated user with a valid token."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Profile - No Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/auth/profile",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "profile"]
+            },
+            "description": "Attempts to get user profile without a token (expected to fail with 401)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Profile - Invalid Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer INVALID_TOKEN_HERE" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/auth/profile",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "auth", "profile"]
+            },
+            "description": "Attempts to get user profile with an invalid token (expected to fail with 401)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "description": "CRUD operations and assignment for tasks.",
+      "item": [
+        {
+          "name": "Get List of Tasks - All",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/tasks",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks"]
+            },
+            "description": "Retrieves all tasks based on user role."
+          },
+          "response": []
+        },
+        {
+          "name": "Get List of Tasks - Filter by Status (Pending)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/tasks?status=Pending",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks"],
+              "query": [ { "key": "status", "value": "Pending" } ]
+            },
+            "description": "Retrieves tasks filtered by Status: Pending."
+          },
+          "response": []
+        },
+        {
+          "name": "Get List of Tasks - Filter by Priority (High)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/tasks?priority=High",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks"],
+              "query": [ { "key": "priority", "value": "High" } ]
+            },
+            "description": "Retrieves tasks filtered by Priority: High."
+          },
+          "response": []
+        },
+        {
+          "name": "Get List of Tasks - Search (Documentation)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/tasks?search=documentation",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks"],
+              "query": [ { "key": "search", "value": "documentation" } ]
+            },
+            "description": "Retrieves tasks matching 'documentation' in title or description."
+          },
+          "response": []
+        },
+        {
+          "name": "Get List of Tasks - Combined Filters & Search",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/tasks?status=In Progress&priority=Medium&search=task",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks"],
+              "query": [
+                { "key": "status", "value": "In Progress" },
+                { "key": "priority", "value": "Medium" },
+                { "key": "search", "value": "task" }
+              ]
+            },
+            "description": "Retrieves tasks filtered by status, priority, and search term."
+          },
+          "response": []
+        },
+        {
+          "name": "Get List of Tasks - Sort by DueDate Desc",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/tasks?sortBy=dueDate&sortOrder=desc",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks"],
+              "query": [
+                { "key": "sortBy", "value": "dueDate" },
+                { "key": "sortOrder", "value": "desc" }
+              ]
+            },
+            "description": "Retrieves tasks sorted by due date in descending order."
+          },
+          "response": []
+        },
+        {
+          "name": "Create a New Task - Valid",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Implement caching mechanism\",\n  \"description\": \"Set up Redis for API response caching.\",\n  \"dueDate\": \"2025-12-15\",\n  \"priority\": \"High\",\n  \"assignedTo\": \"{{ASSIGNED_TO_USER_ID}}\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/tasks",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks"]
+            },
+            "description": "Creates a new task with valid details."
+          },
+          "response": []
+        },
+        {
+          "name": "Create a New Task - Missing Title",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Task without title.\",\n  \"dueDate\": \"2025-12-10\",\n  \"priority\": \"Medium\",\n  \"assignedTo\": \"{{ASSIGNED_TO_USER_ID}}\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/tasks",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks"]
+            },
+            "description": "Attempts to create a task with a missing title (expected to fail with 400)."
+          },
+          "response": []
+        },
+        {
+          "name": "Create a New Task - Invalid Priority",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Invalid Priority Task\",\n  \"description\": \"This task has an invalid priority.\",\n  \"priority\": \"Very High\",\n  \"assignedTo\": \"{{ASSIGNED_TO_USER_ID}}\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/tasks",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks"]
+            },
+            "description": "Attempts to create a task with an invalid priority enum value (expected to fail with 400)."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Task Details - Valid",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"In Progress\",\n  \"priority\": \"High\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/tasks/{{TASK_ID}}",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks", "{{TASK_ID}}"]
+            },
+            "description": "Updates an existing task's status and priority with valid values."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Task Details - Invalid Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Invalid Status\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/tasks/{{TASK_ID}}",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks", "{{TASK_ID}}"]
+            },
+            "description": "Attempts to update a task with an invalid status enum value (expected to fail with 400)."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a Task - Valid",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/tasks/{{TASK_ID}}",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks", "{{TASK_ID}}"]
+            },
+            "description": "Deletes an existing task (requires creator ownership or Admin role)."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a Task - Invalid ID",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/tasks/INVALID_TASK_ID",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks", "INVALID_TASK_ID"]
+            },
+            "description": "Attempts to delete a task with an invalid/non-existent ID (expected to fail with 404)."
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Task - Valid",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{NEW_ASSIGNEE_USER_ID}}\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/tasks/{{TASK_ID}}/assign",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks", "{{TASK_ID}}", "assign"]
+            },
+            "description": "Reassigns an existing task to a new user ID (requires Admin or Manager role)."
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Task - Invalid User ID",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"INVALID_USER_ID\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/tasks/{{TASK_ID}}/assign",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "tasks", "{{TASK_ID}}", "assign"]
+            },
+            "description": "Attempts to reassign a task to an invalid user ID (expected to fail with 400 or 404)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Administration",
+      "description": "Endpoints for user management (Admin role required).",
+      "item": [
+        {
+          "name": "Update User Role - Valid",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_ADMIN_JWT_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"Manager\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/admin/users/{{USER_ID_TO_UPDATE}}/role",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "admin", "users", "{{USER_ID_TO_UPDATE}}", "role"]
+            },
+            "description": "Sets a user's role to 'Manager' with valid Admin token (expected to succeed)."
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Role - Invalid Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_ADMIN_JWT_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"SuperAdmin\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/admin/users/{{USER_ID_TO_UPDATE}}/role",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "admin", "users", "{{USER_ID_TO_UPDATE}}", "role"]
+            },
+            "description": "Attempts to set a user's role to an invalid value (expected to fail with 400)."
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Role - Non-Admin Token",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"Manager\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/admin/users/{{USER_ID_TO_UPDATE}}/role",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "admin", "users", "{{USER_ID_TO_UPDATE}}", "role"]
+            },
+            "description": "Attempts to update a user's role with a non-Admin token (expected to fail with 403 Forbidden)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "description": "Endpoints for retrieving task statistics (Advanced Feature).",
+      "item": [
+        {
+          "name": "Get Task Statistics - Valid Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{YOUR_JWT_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/analytics/tasks",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "analytics", "tasks"]
+            },
+            "description": "Retrieves task distribution relevant to the authenticated user's role."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Task Statistics - No Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/analytics/tasks",
+              "protocol": "http",
+              "host": ["localhost", "5000"],
+              "path": ["api", "analytics", "tasks"]
+            },
+            "description": "Attempts to retrieve task statistics without authentication (expected to fail with 401)."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
