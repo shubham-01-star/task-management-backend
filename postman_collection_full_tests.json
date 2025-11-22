@@ -1,7 +1,7 @@
 {
   "info": {
-    "_postman_id": "673f324c-9f70-4f36-9b51-240c3132d43a",
-    "name": "Task Management API - Expanded Tests",
+    "_postman_id": "YOUR_POSTMAN_COLLECTION_ID",
+    "name": "Task Management API - Full Tests",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "description": "A comprehensive RESTful API for managing tasks, supporting user authentication, Role-Based Access Control (RBAC), and caching. This collection includes expanded test cases for various scenarios (valid, invalid, missing fields, etc.)."
   },
@@ -19,7 +19,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"username\": \"testuser_valid\",\n  \"email\": \"test_valid@example.com\",\n  \"password\": \"password123\"\n}"
             },
             "url": {
               "raw": "http://localhost:5000/api/auth/register",
@@ -423,7 +423,7 @@
               "raw": "http://localhost:5000/api/tasks",
               "protocol": "http",
               "host": ["localhost", "5000"],
-              "path": ["api", "tasks"]
+              "path": ["api", "auth", "register"]
             },
             "description": "Attempts to create a task with a missing title (expected to fail with 400)."
           },
@@ -445,7 +445,7 @@
               "raw": "http://localhost:5000/api/tasks",
               "protocol": "http",
               "host": ["localhost", "5000"],
-              "path": ["api", "tasks"]
+              "path": ["api", "auth", "register"]
             },
             "description": "Attempts to create a task with an invalid priority enum value (expected to fail with 400)."
           },

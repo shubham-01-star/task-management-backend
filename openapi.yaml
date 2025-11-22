@@ -1,562 +1,568 @@
 openapi: 3.0.3
 info:
-title: Task Management API
-description: A comprehensive RESTful API for managing tasks, supporting user authentication, Role-Based Access Control (RBAC), and caching.
-version: 1.0.0
+  title: Task Management API
+  description: A comprehensive RESTful API for managing tasks, supporting user authentication, Role-Based Access Control (RBAC), and caching.
+  version: 1.0.0
 servers:
-
-url: http://localhost:5000/api
-description: Local Development Server
+  - url: http://localhost:5000/api
+    description: Local Development Server
 tags:
-
-name: Authentication
-description: User registration, login, and profile management.
-
-name: Tasks
-description: CRUD operations and assignment for tasks.
-
-name: Administration
-description: Endpoints for user management (Admin role required).
-
-name: Analytics
-description: Endpoints for retrieving task statistics (Advanced Feature).
+  - name: Authentication
+    description: User registration, login, and profile management.
+  - name: Tasks
+    description: CRUD operations and assignment for tasks.
+  - name: Administration
+    description: Endpoints for user management (Admin role required).
+  - name: Analytics
+    description: Endpoints for retrieving task statistics (Advanced Feature).
+x-tagGroups:
+  - name: User Management
+    tags:
+      - Authentication
+      - Administration
+  - name: Task Management
+    tags:
+      - Tasks
+  - name: Data & Analytics
+    tags:
+      - Analytics
 
 components:
-securitySchemes:
-bearerAuth:
-type: http
-scheme: bearer
-bearerFormat: JWT
-schemas:
-UserRole:
-type: string
-enum: [User, Manager, Admin]
-description: The role assigned to the user for access control.
-AuthToken:
-type: object
-properties:
-token:
-type: string
-description: JWT token used for subsequent authenticated requests.
-required:
-- token
-UserCredentials:
-type: object
-properties:
-email:
-type: string
-format: email
-example: john.doe@example.com
-password:
-type: string
-format: password
-minLength: 6
-example: StrongPassword123
-required:
-- email
-- password
-UserProfile:
-type: object
-properties:
-id:
-type: string
-format: uuid
-description: Unique ID of the user.
-username:
-type: string
-example: john_doe
-email:
-type: string
-format: email
-example: john.doe@example.com
-role:
-$ref: '#/components/schemas/UserRole'
-createdAt:
-type: string
-format: date-time
-required:
-- id
-- username
-- email
-- role
-TaskPriority:
-type: string
-enum: [Low, Medium, High]
-TaskStatus:
-type: string
-enum: [Pending, In Progress, Completed, Overdue]
-Task:
-type: object
-properties:
-id:
-type: string
-format: uuid
-description: Unique ID of the task.
-title:
-type: string
-example: Implement authentication endpoint
-description:
-type: string
-nullable: true
-example: Set up JWT token issuance and validation.
-status:
-$ref: '#/components/schemas/TaskStatus'
-priority:
-$ref: '#/components/schemas/TaskPriority'
-dueDate:
-type: string
-format: date
-nullable: true
-example: '2025-12-31'
-assignedTo:
-type: string
-format: uuid
-description: User ID of the assignee.
-createdBy:
-type: string
-format: uuid
-description: User ID of the task creator.
-createdAt:
-type: string
-format: date-time
-updatedAt:
-type: string
-format: date-time
-required:
-- title
-- status
-- priority
-- assignedTo
-- createdBy
-- createdAt
-AnalyticsResponse:
-type: object
-description: Task distribution statistics for the authenticated user based on their role.
-properties:
-totalTasks:
-type: integer
-example: 45
-tasksByStatus:
-type: object
-properties:
-Pending:
-type: integer
-example: 10
-InProgress:
-type: integer
-example: 20
-Completed:
-type: integer
-example: 15
-tasksByPriority:
-type: object
-properties:
-Low:
-type: integer
-example: 5
-Medium:
-type: integer
-example: 30
-High:
-type: integer
-example: 10
-required:
-- totalTasks
-- tasksByStatus
-- tasksByPriority
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    UserRole:
+      type: string
+      enum: [User, Manager, Admin]
+      description: The role assigned to the user for access control.
+    AuthToken:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT token used for subsequent authenticated requests.
+      required:
+        - token
+    UserCredentials:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        password:
+          type: string
+          format: password
+          minLength: 6
+          example: StrongPassword123
+      required:
+        - email
+        - password
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique ID of the user.
+        username:
+          type: string
+          example: john_doe
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        role:
+          $ref: '#/components/schemas/UserRole'
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - username
+        - email
+        - role
+    TaskPriority:
+      type: string
+      enum: [Low, Medium, High]
+    TaskStatus:
+      type: string
+      enum: [Pending, In Progress, Completed, Overdue]
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique ID of the task.
+        title:
+          type: string
+          example: Implement authentication endpoint
+        description:
+          type: string
+          nullable: true
+          example: Set up JWT token issuance and validation.
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        priority:
+          $ref: '#/components/schemas/TaskPriority'
+        dueDate:
+          type: string
+          format: date
+          nullable: true
+          example: '2025-12-31'
+        assignedTo:
+          type: string
+          format: uuid
+          description: User ID of the assignee.
+        createdBy:
+          type: string
+          format: uuid
+          description: User ID of the task creator.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - title
+        - status
+        - priority
+        - assignedTo
+        - createdBy
+        - createdAt
+    AnalyticsResponse:
+      type: object
+      description: Task distribution statistics for the authenticated user based on their role.
+      properties:
+        totalTasks:
+          type: integer
+          example: 45
+        tasksByStatus:
+          type: object
+          properties:
+            Pending:
+              type: integer
+              example: 10
+            InProgress:
+              type: integer
+              example: 20
+            Completed:
+              type: integer
+              example: 15
+        tasksByPriority:
+          type: object
+          properties:
+            Low:
+              type: integer
+              example: 5
+            Medium:
+              type: integer
+              example: 30
+            High:
+              type: integer
+              example: 10
+      required:
+        - totalTasks
+        - tasksByStatus
+        - tasksByPriority
 
 paths:
 
---- Authentication Routes ---
+  # Authentication Routes
 
-/auth/register:
-post:
-tags:
-- Authentication
-summary: Register a new user
-description: Creates a new user account with default 'User' role.
-requestBody:
-required: true
-content:
-application/json:
-schema:
-type: object
-properties:
-username:
-type: string
-example: john_doe
-email:
-type: string
-format: email
-example: john.doe@example.com
-password:
-type: string
-format: password
-minLength: 6
-example: StrongPassword123
-required:
-- username
-- email
-- password
-responses:
-'201':
-description: User registered successfully. Returns a JWT token.
-content:
-application/json:
-schema:
-$ref: '#/components/schemas/AuthToken'
-'400':
-description: Validation error (e.g., existing user, invalid format).
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Creates a new user account with default 'User' role.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: john_doe
+                email:
+                  type: string
+                  format: email
+                  example: john.doe@example.com
+                password:
+                  type: string
+                  format: password
+                  minLength: 6
+                  example: StrongPassword123
+              required:
+                - username
+                - email
+                - password
+      responses:
+        '201':
+          description: User registered successfully. Returns a JWT token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+        '400':
+          description: Validation error (e.g., existing user, invalid format).
 
-/auth/login:
-post:
-tags:
-- Authentication
-summary: Log in user
-description: Authenticates a user and returns a JWT token. This endpoint is rate-limited (5 attempts per 5 minutes).
-requestBody:
-required: true
-content:
-application/json:
-schema:
-$ref: '#/components/schemas/UserCredentials'
-responses:
-'200':
-description: Login successful.
-content:
-application/json:
-schema:
-$ref: '#/components/schemas/AuthToken'
-'400':
-description: Invalid Credentials or Validation error.
-'429':
-description: Too many login attempts (Rate Limit exceeded).
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Log in user
+      description: Authenticates a user and returns a JWT token. This endpoint is rate-limited (5 attempts per 5 minutes).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentials'
+      responses:
+        '200':
+          description: Login successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+        '400':
+          description: Invalid Credentials or Validation error.
+        '429':
+          description: Too many login attempts (Rate Limit exceeded).
 
-/auth/logout:
-post:
-tags:
-- Authentication
-summary: Log out user
-description: Logs out the user by discarding the client's JWT token. This endpoint does not perform server-side token invalidation. Requires authentication.
-security:
-- bearerAuth: []
-responses:
-'200':
-description: Successfully logged out.
-'401':
-description: Unauthorized (Token missing or invalid).
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Log out user
+      description: Logs out the user by discarding the client's JWT token. This endpoint does not perform server-side token invalidation. Requires authentication.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully logged out.
+        '401':
+          description: Unauthorized (Token missing or invalid).
 
-/auth/profile:
-get:
-tags:
-- Authentication
-summary: Retrieve authenticated user profile
-description: Gets the details of the currently authenticated user.
-security:
-- bearerAuth: []
-responses:
-'200':
-description: User profile retrieved successfully.
-content:
-application/json:
-schema:
-$ref: '#/components/schemas/UserProfile'
-'401':
-description: Unauthorized (Token missing or invalid).
-'404':
-description: User not found.
+  /auth/profile:
+    get:
+      tags:
+        - Authentication
+      summary: Retrieve authenticated user profile
+      description: Gets the details of the currently authenticated user.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Unauthorized (Token missing or invalid).
+        '404':
+          description: User not found.
 
---- Task Routes ---
+  # Task Routes
 
-/tasks:
-get:
-tags:
-- Tasks
-summary: Get list of tasks
-description: Retrieves tasks based on user role (User=assigned tasks, Manager=created/assigned tasks, Admin=all tasks). This endpoint is cached (60s).
-security:
-- bearerAuth: []
-parameters:
-- name: search
-  in: query
-  schema:
-    type: string
-  description: Search for tasks by keywords in title or description.
-- name: status
-in: query
-schema:
-$ref: '#/components/schemas/TaskStatus'
-description: Filter tasks by status.
-- name: priority
-in: query
-schema:
-$ref: '#/components/schemas/TaskPriority'
-description: Filter tasks by priority.
-- name: sortBy
-in: query
-schema:
-type: string
-enum: [createdAt, dueDate, priority]
-description: Field to sort by.
-- name: sortOrder
-in: query
-schema:
-type: string
-enum: [asc, desc]
-description: Sort direction (default: desc).
-responses:
-'200':
-description: List of tasks retrieved.
-content:
-application/json:
-schema:
-type: array
-items:
-$ref: '#/components/schemas/Task'
-'401':
-description: Unauthorized.
-post:
-tags:
-- Tasks
-summary: Create a new task
-description: Creates a new task. Accessible to all roles.
-security:
-- bearerAuth: []
-requestBody:
-required: true
-content:
-application/json:
-schema:
-type: object
-properties:
-title:
-type: string
-example: Finalize OpenAPI documentation
-description:
-type: string
-nullable: true
-dueDate:
-type: string
-format: date
-nullable: true
-example: '2025-12-01'
-priority:
-$ref: '#/components/schemas/TaskPriority'
-assignedTo:
-type: string
-format: uuid
-description: The ID of the user to whom the task is assigned.
-required:
-- title
-- assignedTo
-responses:
-'201':
-description: Task created successfully.
-content:
-application/json:
-schema:
-$ref: '#/components/schemas/Task'
-'400':
-description: Validation error.
+  /tasks:
+    get:
+      tags:
+        - Tasks
+      summary: Get list of tasks
+      description: Retrieves tasks based on user role (User=assigned tasks, Manager=created/assigned tasks, Admin=all tasks). This endpoint is cached (60s).
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search for tasks by keywords in title or description.
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/TaskStatus'
+          description: Filter tasks by status.
+        - name: priority
+          in: query
+          schema:
+            $ref: '#/components/schemas/TaskPriority'
+          description: Filter tasks by priority.
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [createdAt, dueDate, priority]
+          description: Field to sort by.
+        - name: sortOrder
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Sort direction (default: desc).
+      responses:
+        '200':
+          description: List of tasks retrieved.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized.
+    post:
+      tags:
+        - Tasks
+      summary: Create a new task
+      description: Creates a new task. Accessible to all roles.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Finalize OpenAPI documentation
+                description:
+                  type: string
+                  nullable: true
+                dueDate:
+                  type: string
+                  format: date
+                  nullable: true
+                  example: '2025-12-01'
+                priority:
+                  $ref: '#/components/schemas/TaskPriority'
+                assignedTo:
+                  type: string
+                  format: uuid
+                  description: The ID of the user to whom the task is assigned.
+              required:
+                - title
+                - assignedTo
+      responses:
+        '201':
+          description: Task created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Validation error.
 
-/tasks/{id}:
-put:
-tags:
-- Tasks
-summary: Update task details
-description: Updates an existing task. Requires ownership (creator/assignee) or Admin role.
-security:
-- bearerAuth: []
-parameters:
-- name: id
-in: path
-required: true
-schema:
-type: string
-format: uuid
-description: The ID of the task to update.
-requestBody:
-required: true
-content:
-application/json:
-schema:
-type: object
-properties:
-title:
-type: string
-description:
-type: string
-status:
-$ref: '#/components/schemas/TaskStatus'
-priority:
-$ref: '#/components/schemas/TaskPriority'
-dueDate:
-type: string
-format: date
-assignedTo:
-type: string
-format: uuid
-minProperties: 1
-responses:
-'200':
-description: Task updated successfully.
-content:
-application/json:
-schema:
-$ref: '#/components/schemas/Task'
-'401':
-description: Unauthorized.
-'403':
-description: Forbidden (Lacks ownership or Admin role).
-'404':
-description: Task not found.
-delete:
-tags:
-- Tasks
-summary: Delete a task
-description: Deletes an existing task. Requires Creator ownership or Admin role.
-security:
-- bearerAuth: []
-parameters:
-- name: id
-in: path
-required: true
-schema:
-type: string
-format: uuid
-description: The ID of the task to delete.
-responses:
-'200':
-description: Task deleted successfully.
-content:
-application/json:
-schema:
-type: object
-properties:
-msg:
-type: string
-example: Task removed
-'401':
-description: Unauthorized.
-'403':
-description: Forbidden (Lacks creator ownership or Admin role).
-'404':
-description: Task not found.
+  /tasks/{id}:
+    put:
+      tags:
+        - Tasks
+      summary: Update task details
+      description: Updates an existing task. Requires ownership (creator/assignee) or Admin role.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the task to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                status:
+                  $ref: '#/components/schemas/TaskStatus'
+                priority:
+                  $ref: '#/components/schemas/TaskPriority'
+                dueDate:
+                  type: string
+                  format: date
+                assignedTo:
+                  type: string
+                  format: uuid
+              minProperties: 1
+      responses:
+        '200':
+          description: Task updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden (Lacks ownership or Admin role).
+        '404':
+          description: Task not found.
+    delete:
+      tags:
+        - Tasks
+      summary: Delete a task
+      description: Deletes an existing task. Requires Creator ownership or Admin role.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the task to delete.
+      responses:
+        '200':
+          description: Task deleted successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: Task removed
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden (Lacks creator ownership or Admin role).
+        '404':
+          description: Task not found.
 
-/tasks/{taskId}/assign:
-put:
-tags:
-- Tasks
-summary: Assign task to a different user
-description: Reassigns an existing task to a new user ID. Only accessible to Admin and Manager roles.
-security:
-- bearerAuth: []
-parameters:
-- name: taskId
-in: path
-required: true
-schema:
-type: string
-format: uuid
-description: The ID of the task to reassign.
-requestBody:
-required: true
-content:
-application/json:
-schema:
-type: object
-properties:
-userId:
-type: string
-format: uuid
-description: The ID of the new user to assign the task to.
-required:
-- userId
-responses:
-'200':
-description: Task reassigned successfully.
-content:
-application/json:
-schema:
-$ref: '#/components/schemas/Task'
-'400':
-description: Invalid Task ID or User ID.
-'401':
-description: Unauthorized.
-'403':
-description: Forbidden (Lacks Admin or Manager role).
-'404':
-description: Task not found.
+  /tasks/{taskId}/assign:
+    put:
+      tags:
+        - Tasks
+      summary: Assign task to a different user
+      description: Reassigns an existing task to a new user ID. Only accessible to Admin and Manager roles.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the task to reassign.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  format: uuid
+                  description: The ID of the new user to assign the task to.
+              required:
+                - userId
+      responses:
+        '200':
+          description: Task reassigned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Invalid Task ID or User ID.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden (Lacks Admin or Manager role).
+        '404':
+          description: Task not found.
 
---- Admin Route ---
+  # Admin Route
 
-/admin/users/{userId}/role:
-put:
-tags:
-- Administration
-summary: Update a user's role
-description: Sets the role of any user to Admin, Manager, or User. Requires Admin role.
-security:
-- bearerAuth: []
-parameters:
-- name: userId
-in: path
-required: true
-schema:
-type: string
-format: uuid
-description: The ID of the user whose role is to be updated.
-requestBody:
-required: true
-content:
-application/json:
-schema:
-type: object
-properties:
-role:
-$ref: '#/components/schemas/UserRole'
-required:
-- role
-responses:
-'200':
-description: User role updated successfully.
-content:
-application/json:
-schema:
-type: object
-properties:
-msg:
-type: string
-example: Role for user john_doe updated to Manager
-user:
-$ref: '#/components/schemas/UserProfile'
-'400':
-description: Validation error (e.g., invalid role format).
-'401':
-description: Unauthorized (Token missing or invalid).
-'403':
-description: Forbidden (Non-Admin user attempted the update).
-'404':
-description: User not found.
+  /admin/users/{userId}/role:
+    put:
+      tags:
+        - Administration
+      summary: Update a user's role
+      description: Sets the role of any user to Admin, Manager, or User. Requires Admin role.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the user whose role is to be updated.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  $ref: '#/components/schemas/UserRole'
+              required:
+                - role
+      responses:
+        '200':
+          description: User role updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: Role for user john_doe updated to Manager
+                  user:
+                    $ref: '#/components/schemas/UserProfile'
+        '400':
+          description: Validation error (e.g., invalid role format).
+        '401':
+          description: Unauthorized (Token missing or invalid).
+        '403':
+          description: Forbidden (Non-Admin user attempted the update).
+        '404':
+          description: User not found.
 
---- Analytics Route (New Section) ---
+  # Analytics Route (New Section)
 
-/analytics/tasks:
-get:
-tags:
-- Analytics
-summary: Get task statistics
-description: Retrieves task distribution (total, status, priority) relevant to the authenticated user's role.
-security:
-- bearerAuth: []
-responses:
-'200':
-description: Task statistics retrieved successfully.
-content:
-application/json:
-schema:
-$ref: '#/components/schemas/AnalyticsResponse'
-'401':
-description: Unauthorized.
-'500':
-description: Server error calculating analytics.
+  /analytics/tasks:
+    get:
+      tags:
+        - Analytics
+      summary: Get task statistics
+      description: Retrieves task distribution (total, status, priority) relevant to the authenticated user's role.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Task statistics retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse'
+        '401':
+          description: Unauthorized.
+        '500':
+          description: Server error calculating analytics.

@@ -2,22 +2,25 @@ import express, { Request, Response, NextFunction } from 'express'; // Added nec
 import dotenv from 'dotenv';
 import connectDB from './config/db';
 import authRoutes from './routes/auth';
-import taskRoutes from './routes/task'; // Using the user's singular 'task' route
-import { createServer } from 'http'; // 👈 REQUIRED: Node.js HTTP module for Socket.IO
-import { initSocket } from './utils/socket'; // 👈 REQUIRED: Socket.IO initializer
-import { requestLogger } from './middleware/requestLogger'; // Import the new requestLogger
+import taskRoutes from './routes/task'; 
+import { createServer } from 'http'; 
+import { initSocket } from './utils/socket';
+import { requestLogger } from './middleware/requestLogger'; 
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 
+// --- Swagger Docs Setup ---
+const swaggerDocument = YAML.load('./openapi.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 // --- Middleware Setup ---
 
 app.use(requestLogger); // Use the request logger middleware here
-
-// Rate Limiting (Assuming this is used as per assignment requirements)
-
 
 // Init Middleware: Allows us to accept JSON data in the body
 app.use(express.json());
