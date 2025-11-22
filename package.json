@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/server.js",
-    "dev": "nodemon --exec ts-node src/server.ts",
+    "start": "node dist/index.js",
+    "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
     "test": "npx dotenv -e .env -- jest",
     "test:watch": "dotenv -e .env -- jest --watch"
